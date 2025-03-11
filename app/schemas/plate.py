@@ -15,7 +15,11 @@ class PlateBase(BaseModel):
 
 class PlateCreate(PlateBase):
     """Schema for creating a new plate"""
-    pass
+    plate_number: str
+    description: str
+    deadline: datetime
+    created_by_id: int
+
 
 
 class PlateUpdate(BaseModel):

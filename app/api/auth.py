@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from app.controllers.user_controller import UserController
 from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import UserCreate, UserResponse
 from app.core.security import (
     authenticate_user,
     create_access_token,

@@ -7,7 +7,7 @@ from datetime import datetime
 
 from app.database import get_session
 from app.models.plate import AutoPlate
-from app.schemas.bid import BidCreate
+from app.schemas.plate import PlateCreate, PlateUpdate
 
 
 class PlateController:
@@ -15,7 +15,7 @@ class PlateController:
         self.__session: AsyncSession = session
 
 
-    async def create_plate(self, data: BidCreate) -> AutoPlate:
+    async def create_plate(self, data: PlateCreate) -> AutoPlate:
         """
         Create a new auto plate
         """
@@ -50,14 +50,14 @@ class PlateController:
         """
         return await self.__session.get(AutoPlate, plate_id)
 
-    async def list_plates(self, skip: int = 0, limit: int = 100)-> Sequence[AutoPlate]:
+    async def get_plates(self, skip: int = 0, limit: int = 100)-> Sequence[AutoPlate]:
         """
         Get all plates
         """
         plates = await self.__session.execute(select(AutoPlate).offset(skip).limit(limit))
         return plates.scalars().all()
 
-    async def update_plate(self, plate_id: int, data: BidCreate) -> Optional[AutoPlate]:
+    async def update_plate(self, plate_id: int, data: PlateUpdate) -> Optional[AutoPlate]:
         """
         Update a plate
         """

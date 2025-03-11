@@ -70,7 +70,7 @@ class BidController:
         """
         return await self.__session.get(Bid, bid_id)
 
-    async def list_bids(self, skip: int = 0, limit: int = 100) -> Sequence[Bid]:
+    async def get_bids(self, skip: int = 0, limit: int = 100) -> Sequence[Bid]:
         """
         Get all bids
         """
