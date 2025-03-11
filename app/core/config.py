@@ -13,7 +13,9 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     APP_DESCRIPTION: str = "API for auto license plate bidding system"
     API_PREFIX: str = "/api/v1"
-    DEBUG: bool = False
+    DEBUG: bool = True
+    PORT: int = 8000
+
 
     # JWT Authentication settings
     SECRET_KEY: str = os.getenv("SECRET_KEY", "supersecretkey123")
@@ -38,9 +40,6 @@ class Settings(BaseSettings):
     CORS_ALLOW_METHODS: list = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     CORS_ALLOW_HEADERS: list = ["*"]
 
-    # Pagination settings
-    DEFAULT_PAGE_SIZE: int = 10
-    MAX_PAGE_SIZE: int = 100
 
     class Config:
         env_file = ".env"

@@ -1,8 +1,9 @@
 import os
 from typing import AsyncGenerator
 
+from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import declarative_base
 
 # Get database URL from environment variable
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./auto_plate_bidding.db")
@@ -18,9 +19,8 @@ async_session_factory = async_sessionmaker(
     class_=AsyncSession,
 )
 
-
-Base = DeclarativeBase()
-
+# Create a Base class with metadata
+Base = declarative_base(metadata=MetaData())
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_factory() as session:
