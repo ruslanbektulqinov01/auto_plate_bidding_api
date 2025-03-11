@@ -19,8 +19,7 @@ async_session_factory = async_sessionmaker(
 )
 
 
-class Base(DeclarativeBase):
-    pass
+Base = DeclarativeBase()
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
