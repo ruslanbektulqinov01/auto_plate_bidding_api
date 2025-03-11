@@ -14,8 +14,10 @@ class BidBase(BaseModel):
 
 
 class BidCreate(BidBase):
-    """Schema for creating a new bid"""
-    pass
+    plate_number: str
+    description: str
+    deadline: datetime
+    created_by_id: int
 
 
 class BidUpdate(BaseModel):

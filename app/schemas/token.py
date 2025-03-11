@@ -4,22 +4,14 @@ from typing import Optional
 
 class Token(BaseModel):
     """
-    Schema for the token response that will be returned to users
+    Schema for token response
     """
     access_token: str
-    token_type: str = "bearer"
-
-
-class TokenPayload(BaseModel):
-    """
-    Schema representing the payload of JWT token
-    """
-    sub: Optional[str] = None
-    exp: Optional[int] = None
+    token_type: str
 
 
 class TokenData(BaseModel):
     """
-    Schema containing user information extracted from token
+    Schema for token payload data
     """
-    user_id: Optional[str] = None
+    username: Optional[str] = None
