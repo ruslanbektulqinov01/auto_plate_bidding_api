@@ -2,13 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.controllers.user_controller import UserController
+from app.database import get_session
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
 from app.core.security import (
     authenticate_user,
     create_access_token,
     get_current_active_user,
+    get_current_user,
 )
 from app.schemas.token import Token
 
@@ -22,14 +26,12 @@ auth_router = APIRouter(tags=["Authentication"])
 @auth_router.post("/token", response_model=Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    user_controller: UserController = Depends(),
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Authenticate user and generate JWT token
     """
-    user = await authenticate_user(
-        user_controller, form_data.username, form_data.password
-    )
+    user = await authenticate_user(form_data.username, form_data.password, session)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -55,7 +57,7 @@ async def register_user(
 
 
 @auth_router.get("/me", response_model=UserResponse)
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
+async def read_users_me(current_user: User = Depends(get_current_user)):
     """
     Get information about the currently authenticated user
     """

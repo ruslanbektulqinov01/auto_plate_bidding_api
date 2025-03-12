@@ -14,17 +14,13 @@ class PlateController:
     def __init__(self, session: AsyncSession = Depends(get_session)):
         self.__session: AsyncSession = session
 
-    async def create_plate(self, data: PlateCreate) -> AutoPlate:
+    async def create_plate(self, data: PlateCreate, user) -> AutoPlate:
         """
         Create a new auto plate
         """
-        plate = AutoPlate(
-            plate_number=data.plate_number,
-            description=data.description,
-            deadline=data.deadline,
-            created_by_id=data.created_by_id,
-            is_active=True,
-        )
+        # with model_dump
+        plate = AutoPlate(**data.model_dump())
+        plate.created_by_id = user.id
         self.__session.add(plate)
         await self.__session.commit()
         await self.__session.refresh(plate)

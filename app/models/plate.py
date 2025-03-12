@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Boolean
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    DateTime,
+    Text,
+    Boolean,
+    Float,
+)
 from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime
@@ -10,6 +19,7 @@ class AutoPlate(Base):
     id = Column(Integer, primary_key=True, index=True)
     plate_number = Column(String(10), unique=True, index=True)
     description = Column(Text)
+    price = Column(Float(precision=2))
     deadline = Column(DateTime)
     created_by_id = Column(Integer, ForeignKey("users.id"))
     is_active = Column(Boolean, default=True)

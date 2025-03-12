@@ -1,13 +1,14 @@
 from typing import Optional, Sequence
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime
 
+from app.core.security import get_password_hash
 from app.database import get_session
 from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate, User
+from app.schemas.user import UserCreate, UserUpdate, UserSchema
 
 
 class UserController:
@@ -16,10 +17,19 @@ class UserController:
 
     async def create_user(self, data: UserCreate) -> User:
         # Create a new user based UserCreate schema
+        if await self.get_user_by_username(data.username):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already exists",
+            )
+        if await self.get_user_by_email(data.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists"
+            )
         user = User(
             username=data.username,
             email=data.email,
-            hashed_password=data.password,
+            hashed_password=get_password_hash(data.password),
             is_staff=data.is_staff,
         )
         self.__session.add(user)
@@ -37,13 +47,17 @@ class UserController:
         """
         Get a user by email
         """
-        return await self.__session.get(User, email)
+        result = await self.__session.execute(select(User).where(User.email == email))
+        return result.scalars().first()
 
     async def get_user_by_username(self, username: str) -> Optional[User]:
         """
         Get a user by username
         """
-        return await self.__session.get(User, username)
+        result = await self.__session.execute(
+            select(User).where(User.username == username)
+        )
+        return result.scalars().first()
 
     async def list_users(self, skip: int = 0, limit: int = 100) -> Sequence[User]:
         """
@@ -63,13 +77,14 @@ class UserController:
         for field, value in data.model_dump(exclude_unset=True).items():
             # Handle password separately to hash it
             if field == "password" and value is not None:
-                setattr(
-                    user, "hashed_password", value
-                )  # In actual implementation, hash this password
+                setattr(user, "hashed_password", get_password_hash(value))
             elif field != "password":
                 setattr(user, field, value)
 
-        user.updated_at = datetime.now()
+        # Check if the User model has updated_at field
+        if hasattr(user, "updated_at"):
+            user.updated_at = datetime.now()
+
         await self.__session.commit()
         await self.__session.refresh(user)
         return user

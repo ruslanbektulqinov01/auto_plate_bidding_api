@@ -33,7 +33,7 @@ class UserInDBBase(UserBase):
         from_attributes = True
 
 
-class User(UserInDBBase):
+class UserSchema(UserInDBBase):
     """Schema for public user data (returned to clients)"""
 
     pass

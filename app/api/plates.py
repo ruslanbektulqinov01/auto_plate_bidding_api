@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import get_current_active_user
+from app.core.security import get_current_active_user, get_current_user
 from app.controllers.plate_controller import PlateController
 from app.database import get_session as get_db
 from app.models.user import User
@@ -44,7 +44,7 @@ async def get_plate(
 async def create_plate(
     plate_in: PlateCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Create a new plate.
@@ -58,7 +58,7 @@ async def create_plate(
 
     plate_controller = PlateController(db)
     # Ensure the type is correctly passed to the controller
-    return await plate_controller.create_plate(plate_in)
+    return await plate_controller.create_plate(plate_in, current_user)
 
 
 @router.put("/{plate_id}", response_model=Plate)
@@ -66,7 +66,7 @@ async def update_plate(
     plate_id: int,
     plate_in: PlateUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Update a plate.
@@ -93,7 +93,7 @@ async def update_plate(
 async def delete_plate(
     plate_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Delete a plate.
