@@ -39,9 +39,6 @@ class UserInDB(UserInDBBase):
     hashed_password: str
 
 
-class UserResponse:
+class UserResponse(UserBase):
     """Schema for user response data"""
     id: int
-    username: str
-    email: EmailStr
-    is_staff: bool

@@ -9,7 +9,6 @@ from app.core.security import (
     authenticate_user,
     create_access_token,
     get_current_active_user,
-    get_password_hash
 )
 from app.schemas.token import Token
 
@@ -45,38 +44,12 @@ async def login_for_access_token(
 
 @auth_router.post("/register", response_model=UserResponse)
 async def register_user(
-        user_data: UserCreate,
-        user_controller: UserController = Depends(),
+    user_data: UserCreate,
+    user_controller: UserController = Depends(),
 ):
-    """
-    Register a new user
-    """
-    # Check if user already exists
-    existing_user = await user_controller.get_user_by_username(user_data.username)
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered"
-        )
-
-    existing_email = await user_controller.get_user_by_email(user_data.email)
-    if existing_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-
-    # Hash the password before storing
-    hashed_password = get_password_hash(user_data.password)
-
-    # Update the user_data with hashed password
-    user_data_dict = user_data.model_dump()
-    user_data_dict["password"] = hashed_password
-    user_data = UserCreate(**user_data_dict)
-
-    # Create new user
+    # Your existing code remains the same
     new_user = await user_controller.create_user(user_data)
-    return new_user
+    return new_user  # FastAPI converts this to UserResponse automatically
 
 
 @auth_router.get("/me", response_model=UserResponse)

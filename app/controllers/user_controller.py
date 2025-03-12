@@ -7,7 +7,7 @@ from datetime import datetime
 
 from app.database import get_session
 from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate, User
 
 
 class UserController:
@@ -15,14 +15,12 @@ class UserController:
         self.__session: AsyncSession = session
 
     async def create_user(self, data: UserCreate) -> User:
-        """
-        Create a new user
-        """
+        # Create a new user based UserCreate schema
         user = User(
             username=data.username,
             email=data.email,
-            hashed_password=data.password,  # Note: In actual implementation, you should hash this password
-            is_active=True
+            hashed_password=data.password,
+            is_staff=data.is_staff,
         )
         self.__session.add(user)
         await self.__session.commit()

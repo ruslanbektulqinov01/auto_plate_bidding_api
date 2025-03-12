@@ -7,7 +7,7 @@ app = FastAPI(
     title=settings.APP_NAME,
     description=settings.APP_DESCRIPTION,
     version=settings.APP_VERSION,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"/{settings.APP_VERSION}/openapi.json",
 )
 
 # Set up CORS middleware
@@ -20,9 +20,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.auth_router, prefix=settings.API_V1_STR)
-app.include_router(plates.router, prefix=settings.API_V1_STR)
-app.include_router(bids.router, prefix=settings.API_V1_STR)
+app.include_router(auth.auth_router, prefix=settings.API_PREFIX)
+app.include_router(plates.router, prefix=settings.API_PREFIX)
+app.include_router(bids.router, prefix=settings.API_PREFIX)
 
 @app.get("/")
 async def root():
@@ -44,4 +44,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=settings.PORT, reload=settings.DEBUG)
+    uvicorn.run("main:app", host="0.0.0.0", port=settings.PORT, reload=settings.DEBUG)

@@ -54,7 +54,7 @@ async def create_plate(
     Create a new plate.
     """
     # Check if user has admin privileges
-    if not current_user.is_admin:
+    if not current_user.is_staff:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions to create plates"
@@ -76,7 +76,7 @@ async def update_plate(
     Update a plate.
     """
     # Check if user has admin privileges
-    if not current_user.is_admin:
+    if not current_user.is_staff:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions to update plates"
@@ -104,7 +104,7 @@ async def delete_plate(
     Delete a plate.
     """
     # Check if user has admin privileges
-    if not current_user.is_admin:
+    if not current_user.is_staff:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions to delete plates"
