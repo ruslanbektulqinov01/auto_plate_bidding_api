@@ -24,6 +24,7 @@ app.include_router(auth.auth_router, prefix=settings.API_PREFIX)
 app.include_router(plates.router, prefix=settings.API_PREFIX)
 app.include_router(bids.router, prefix=settings.API_PREFIX)
 
+
 @app.get("/")
 async def root():
     """
@@ -32,8 +33,9 @@ async def root():
     return {
         "message": "Welcome to the License Plate Bidding System API",
         "documentation": f"/docs",
-        "api_version": settings.API_PREFIX
+        "api_version": settings.API_PREFIX,
     }
+
 
 @app.get("/health")
 async def health_check():
@@ -42,6 +44,8 @@ async def health_check():
     """
     return {"status": "healthy"}
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", host="0.0.0.0", port=settings.PORT, reload=settings.DEBUG)

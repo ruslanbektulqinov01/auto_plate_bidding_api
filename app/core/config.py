@@ -16,14 +16,15 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     PORT: int = 8000
 
-
     # JWT Authentication settings
     SECRET_KEY: str = os.getenv("SECRET_KEY", "supersecretkey123")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 * 24 * 60  # 30 days
 
     # Database settings
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./auto_plate_bidding.db")
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL", "sqlite+aiosqlite:///./auto_plate_bidding.db"
+    )
 
     @classmethod
     @field_validator("DATABASE_URL")
@@ -39,7 +40,6 @@ class Settings(BaseSettings):
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: list = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     CORS_ALLOW_HEADERS: list = ["*"]
-
 
     class Config:
         env_file = ".env"

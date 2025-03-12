@@ -39,7 +39,6 @@ class UserController:
         """
         return await self.__session.get(User, email)
 
-
     async def get_user_by_username(self, username: str) -> Optional[User]:
         """
         Get a user by username
@@ -64,7 +63,9 @@ class UserController:
         for field, value in data.model_dump(exclude_unset=True).items():
             # Handle password separately to hash it
             if field == "password" and value is not None:
-                setattr(user, "hashed_password", value)  # In actual implementation, hash this password
+                setattr(
+                    user, "hashed_password", value
+                )  # In actual implementation, hash this password
             elif field != "password":
                 setattr(user, field, value)
 

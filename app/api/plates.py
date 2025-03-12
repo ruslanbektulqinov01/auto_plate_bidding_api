@@ -13,10 +13,7 @@ router = APIRouter(prefix="/plates", tags=["plates"])
 
 @router.get("/", response_model=List[Plate])
 async def get_plates(
-        skip: int = 0,
-        limit: int = 100,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_active_user)
+    skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
 ):
     """
     Get all plates.
@@ -27,9 +24,9 @@ async def get_plates(
 
 @router.get("/{plate_id}", response_model=Plate)
 async def get_plate(
-        plate_id: int,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_active_user)
+    plate_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Get a specific plate by ID.
@@ -38,17 +35,16 @@ async def get_plate(
     plate = await plate_controller.get_plate(plate_id)
     if not plate:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Plate not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Plate not found"
         )
     return plate
 
 
 @router.post("/", response_model=Plate, status_code=status.HTTP_201_CREATED)
 async def create_plate(
-        plate_in: PlateCreate,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_active_user)
+    plate_in: PlateCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Create a new plate.
@@ -57,7 +53,7 @@ async def create_plate(
     if not current_user.is_staff:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to create plates"
+            detail="Not enough permissions to create plates",
         )
 
     plate_controller = PlateController(db)
@@ -67,10 +63,10 @@ async def create_plate(
 
 @router.put("/{plate_id}", response_model=Plate)
 async def update_plate(
-        plate_id: int,
-        plate_in: PlateUpdate,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_active_user)
+    plate_id: int,
+    plate_in: PlateUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Update a plate.
@@ -79,15 +75,14 @@ async def update_plate(
     if not current_user.is_staff:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to update plates"
+            detail="Not enough permissions to update plates",
         )
 
     plate_controller = PlateController(db)
     plate = await plate_controller.get_plate(plate_id)
     if not plate:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Plate not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Plate not found"
         )
 
     updated_plate = await plate_controller.update_plate(plate_id, plate_in)
@@ -96,9 +91,9 @@ async def update_plate(
 
 @router.delete("/{plate_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_plate(
-        plate_id: int,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_active_user)
+    plate_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Delete a plate.
@@ -107,15 +102,14 @@ async def delete_plate(
     if not current_user.is_staff:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to delete plates"
+            detail="Not enough permissions to delete plates",
         )
 
     plate_controller = PlateController(db)
     plate = await plate_controller.get_plate(plate_id)
     if not plate:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Plate not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Plate not found"
         )
 
     await plate_controller.delete_plate(plate_id)

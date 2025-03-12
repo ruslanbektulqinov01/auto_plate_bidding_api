@@ -3,27 +3,26 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime
 
+
 class Bid(Base):
-    __tablename__ = 'bids'
+    __tablename__ = "bids"
 
     id = Column(Integer, primary_key=True, index=True)
     amount = Column(Float(precision=2))
-    user_id = Column(Integer, ForeignKey('users.id'))
-    plate_id = Column(Integer, ForeignKey('auto_plates.id'))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    plate_id = Column(Integer, ForeignKey("auto_plates.id"))
     created_at = Column(DateTime, default=datetime.now)
 
-    user = relationship('User', back_populates='bids')
-    plate = relationship('AutoPlate', back_populates='bids')
+    user = relationship("User", back_populates="bids")
+    plate = relationship("AutoPlate", back_populates="bids")
 
-    __table_args__ = (
-        UniqueConstraint('user_id', 'plate_id', name='uq_user_plate'),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "plate_id", name="uq_user_plate"),)
 
     def __repr__(self):
-        return f'<Bid {self.id}>'
+        return f"<Bid {self.id}>"
 
     def __str__(self):
-        return f'Bid {self.id}'
+        return f"Bid {self.id}"
 
     def __eq__(self, other):
         if not isinstance(other, Bid):
@@ -38,11 +37,9 @@ class Bid(Base):
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'amount': self.amount,
-            'user': self.user.username,
-            'plate': self.plate.plate_number,
-            'created_at': self.created_at
+            "id": self.id,
+            "amount": self.amount,
+            "user": self.user.username,
+            "plate": self.plate.plate_number,
+            "created_at": self.created_at,
         }
-
-

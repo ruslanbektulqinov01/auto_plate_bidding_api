@@ -14,7 +14,6 @@ class PlateController:
     def __init__(self, session: AsyncSession = Depends(get_session)):
         self.__session: AsyncSession = session
 
-
     async def create_plate(self, data: PlateCreate) -> AutoPlate:
         """
         Create a new auto plate
@@ -24,13 +23,12 @@ class PlateController:
             description=data.description,
             deadline=data.deadline,
             created_by_id=data.created_by_id,
-            is_active=True
+            is_active=True,
         )
         self.__session.add(plate)
         await self.__session.commit()
         await self.__session.refresh(plate)
         return plate
-
 
     async def get_plate(self, plate_id: int) -> Optional[AutoPlate]:
         """
@@ -50,14 +48,18 @@ class PlateController:
         """
         return await self.__session.get(AutoPlate, plate_id)
 
-    async def get_plates(self, skip: int = 0, limit: int = 100)-> Sequence[AutoPlate]:
+    async def get_plates(self, skip: int = 0, limit: int = 100) -> Sequence[AutoPlate]:
         """
         Get all plates
         """
-        plates = await self.__session.execute(select(AutoPlate).offset(skip).limit(limit))
+        plates = await self.__session.execute(
+            select(AutoPlate).offset(skip).limit(limit)
+        )
         return plates.scalars().all()
 
-    async def update_plate(self, plate_id: int, data: PlateUpdate) -> Optional[AutoPlate]:
+    async def update_plate(
+        self, plate_id: int, data: PlateUpdate
+    ) -> Optional[AutoPlate]:
         """
         Update a plate
         """
@@ -71,7 +73,6 @@ class PlateController:
         await self.__session.commit()
         await self.__session.refresh(plate)
         return plate
-
 
     async def delete_plate(self, plate_id: int) -> bool:
         """
@@ -91,6 +92,8 @@ class PlateController:
         """
         plate = await self.get_plate(plate_id)
         if not plate:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plate not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Plate not found"
+            )
 
         return plate.get_highest_bid()

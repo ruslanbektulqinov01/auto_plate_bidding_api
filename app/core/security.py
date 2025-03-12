@@ -32,7 +32,9 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-async def authenticate_user(user_controller: UserController, username: str, password: str) -> Union[User, bool]:
+async def authenticate_user(
+    user_controller: UserController, username: str, password: str
+) -> Union[User, bool]:
     """
     Authenticate a user by verifying username and password
     """
@@ -44,7 +46,9 @@ async def authenticate_user(user_controller: UserController, username: str, pass
     return user
 
 
-def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(
+    data: Dict[str, Any], expires_delta: Optional[timedelta] = None
+) -> str:
     """
     Create a JWT token
     """
@@ -59,8 +63,8 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
 
 
 async def get_current_user(
-        token: str = Depends(oauth2_scheme),
-        user_controller: UserController = Depends(),
+    token: str = Depends(oauth2_scheme),
+    user_controller: UserController = Depends(),
 ) -> User:
     """
     Get the current user from token
@@ -87,11 +91,13 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-        current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> User:
     """
     Check if the current user is active
     """
     if not current_user.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+        )
     return current_user

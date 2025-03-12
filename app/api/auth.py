@@ -21,13 +21,15 @@ auth_router = APIRouter(tags=["Authentication"])
 
 @auth_router.post("/token", response_model=Token)
 async def login_for_access_token(
-        form_data: OAuth2PasswordRequestForm = Depends(),
-        user_controller: UserController = Depends(),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    user_controller: UserController = Depends(),
 ):
     """
     Authenticate user and generate JWT token
     """
-    user = await authenticate_user(user_controller, form_data.username, form_data.password)
+    user = await authenticate_user(
+        user_controller, form_data.username, form_data.password
+    )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -53,11 +55,8 @@ async def register_user(
 
 
 @auth_router.get("/me", response_model=UserResponse)
-async def read_users_me(
-        current_user: User = Depends(get_current_active_user)
-):
+async def read_users_me(current_user: User = Depends(get_current_active_user)):
     """
     Get information about the currently authenticated user
     """
     return current_user
-

@@ -15,15 +15,15 @@ from app.controllers.user_controller import UserController
 
 
 class BidController:
-    def __init__(self,
-                 session: AsyncSession = Depends(get_session),
-                    plate_controller: PlateController = Depends(),
-                    user_controller: UserController = Depends()
-                 ):
+    def __init__(
+        self,
+        session: AsyncSession = Depends(get_session),
+        plate_controller: PlateController = Depends(),
+        user_controller: UserController = Depends(),
+    ):
         self.__session: AsyncSession = session
         self.__plate_controller = plate_controller
         self.__user_controller = user_controller
-
 
     async def create_bid(self, data: BidCreate) -> Bid:
         """
@@ -34,15 +34,14 @@ class BidController:
         if not plate or not plate.is_active:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Plate not found or bidding is not active"
+                detail="Plate not found or bidding is not active",
             )
 
         # Check if user exists
         user = await self.__session.get(User, data.user_id)
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
 
         # Check if bid amount is higher than current highest bid
@@ -50,14 +49,14 @@ class BidController:
         if highest_bid and data.amount <= highest_bid.amount:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Bid amount must be higher than current highest bid: {highest_bid.amount}"
+                detail=f"Bid amount must be higher than current highest bid: {highest_bid.amount}",
             )
 
         bid = Bid(
             user_id=data.user_id,
             plate_id=data.plate_id,
             amount=data.amount,
-            is_active=True
+            is_active=True,
         )
         self.__session.add(bid)
         await self.__session.commit()
@@ -104,17 +103,21 @@ class BidController:
         if not plate or not plate.is_active:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot update bid for inactive plate"
+                detail="Cannot update bid for inactive plate",
             )
 
         for field, value in data.model_dump(exclude_unset=True).items():
             # If updating amount, check if it's higher than current highest bid
             if field == "amount" and value is not None:
                 highest_bid = plate.get_highest_bid()
-                if highest_bid and highest_bid.id != bid_id and value <= highest_bid.amount:
+                if (
+                    highest_bid
+                    and highest_bid.id != bid_id
+                    and value <= highest_bid.amount
+                ):
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Bid amount must be higher than current highest bid: {highest_bid.amount}"
+                        detail=f"Bid amount must be higher than current highest bid: {highest_bid.amount}",
                     )
             setattr(bid, field, value)
 
@@ -142,8 +145,7 @@ class BidController:
         user = await self.__user_controller.get_user(user_id)
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
 
         return user.get_active_bids()
@@ -155,8 +157,7 @@ class BidController:
         plate = await self.__plate_controller.get_plate(plate_id)
         if not plate:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Plate not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Plate not found"
             )
 
         return plate.get_highest_bid()
