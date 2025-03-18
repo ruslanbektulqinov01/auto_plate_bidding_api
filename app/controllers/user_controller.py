@@ -16,26 +16,40 @@ class UserController:
         self.__session: AsyncSession = session
 
     async def create_user(self, data: UserCreate) -> User:
-        # Create a new user based UserCreate schema
-        if await self.get_user_by_username(data.username):
+        """Create a new user based on UserCreate schema"""
+        try:
+            # Check if username exists
+            if await self.get_user_by_username(data.username):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Username already exists",
+                )
+
+                # Check if email exists
+            if await self.get_user_by_email(data.email):
+                raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Email already exists"
+                )
+
+            # Create user object without password field
+            user_data = data.model_dump(exclude={"password"})
+            user = User(**user_data)
+
+            # Hash password separately to avoid passlib issues
+            user.hashed_password = get_password_hash(data.password)
+            self.__session.add(user)
+            await self.__session.commit()
+            await self.__session.refresh(user)
+            return user
+        except Exception as e:
+            await self.__session.rollback()
+            if isinstance(e, HTTPException):
+                raise
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already exists",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error creating user: {str(e)}"
             )
-        if await self.get_user_by_email(data.email):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists"
-            )
-        user = User(
-            username=data.username,
-            email=data.email,
-            hashed_password=get_password_hash(data.password),
-            is_staff=data.is_staff,
-        )
-        self.__session.add(user)
-        await self.__session.commit()
-        await self.__session.refresh(user)
-        return user
 
     async def get_user(self, user_id: int) -> Optional[User]:
         """

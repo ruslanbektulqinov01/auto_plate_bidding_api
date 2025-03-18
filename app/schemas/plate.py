@@ -45,8 +45,7 @@ class PlateInDBBase(PlateBase):
 class Plate(PlateInDBBase):
     """Schema for public plate data (returned to clients)"""
 
-    pass
-
+    plate_number: str
 
 class PlateInDB(PlateInDBBase):
     """Schema for plate data stored in DB"""

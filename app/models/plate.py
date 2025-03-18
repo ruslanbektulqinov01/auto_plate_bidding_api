@@ -35,10 +35,5 @@ class AutoPlate(Base):
     def __str__(self):
         return self.plate_number
 
-    def get_highest_bid(self):
-        if not self.bids:
-            return None
-        return max(self.bids, key=lambda bid: bid.amount)
-
     def is_bidding_active(self):
         return self.is_active and self.deadline > datetime.now()

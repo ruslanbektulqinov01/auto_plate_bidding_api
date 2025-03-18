@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, Float, UniqueConstraint
+from sqlalchemy import Column, Integer, ForeignKey, DateTime, Float, UniqueConstraint, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime
@@ -12,7 +12,7 @@ class Bid(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     plate_id = Column(Integer, ForeignKey("auto_plates.id"))
     created_at = Column(DateTime, default=datetime.now)
-
+    is_active = Column(Boolean, default=True)
     user = relationship("User", back_populates="bids")
     plate = relationship("AutoPlate", back_populates="bids")
 

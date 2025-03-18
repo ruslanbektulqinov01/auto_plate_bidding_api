@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from app.api import plates, bids, auth
 from app.core.config import settings
 
@@ -43,7 +45,6 @@ async def health_check():
     Health check endpoint to verify the API is running.
     """
     return {"status": "healthy"}
-
 
 if __name__ == "__main__":
     import uvicorn

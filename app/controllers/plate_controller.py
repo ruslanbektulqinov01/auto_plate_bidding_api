@@ -30,6 +30,8 @@ class PlateController:
         """
         Get a plate by ID
         """
+        if not await self.__session.get(AutoPlate, plate_id):
+            return None
         return await self.__session.get(AutoPlate, plate_id)
 
     async def get_plate_by_number(self, plate_number: str) -> Optional[AutoPlate]:
@@ -86,10 +88,15 @@ class PlateController:
         """
         Get the highest bid for a plate
         """
-        plate = await self.get_plate(plate_id)
-        if not plate:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Plate not found"
-            )
+        from sqlalchemy import select, desc
+        from app.models.bid import Bid
 
-        return plate.get_highest_bid()
+        # Fetch the highest bid directly with a proper query
+        result = await self.__session.execute(
+            select(Bid)
+            .where(Bid.plate_id == plate_id)
+            .order_by(desc(Bid.amount))
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
+
