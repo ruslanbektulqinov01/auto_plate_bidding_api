@@ -10,8 +10,7 @@ from app.models.bid import Bid
 from app.models.user import User
 from app.models.plate import AutoPlate
 from app.schemas.bid import BidCreate, BidUpdate
-from app.controllers.plate_controller import PlateController
-from app.controllers.user_controller import UserController
+from app.tasks.notification_tasks import send_bid_notification
 
 
 class BidController:
@@ -40,8 +39,7 @@ class BidController:
 
         # Check if user already has a bid for this plate
         query = select(Bid).where(
-            Bid.user_id == current_user.id,
-            Bid.plate_id == data.plate_id
+            Bid.user_id == current_user.id, Bid.plate_id == data.plate_id
         )
         result = await self.__session.execute(query)
         existing_bid = result.scalar_one_or_none()
@@ -64,6 +62,23 @@ class BidController:
 
         await self.__session.commit()
         await self.__session.refresh(bid)
+        from app.websocket import manager
+
+        # Broadcast new bid to all connected clients
+        await manager.broadcast_to_plate(
+            bid.plate_id,
+            {
+                "type": "new_bid",
+                "data": {
+                    "id": bid.id,
+                    "amount": bid.amount,
+                    "user_id": bid.user_id,
+                    "plate_id": bid.plate_id,
+                    "timestamp": bid.created_at.isoformat(),
+                },
+            },
+        )
+
         return bid
 
     async def get_bid(self, bid_id: int) -> Optional[Bid]:
@@ -71,18 +86,6 @@ class BidController:
         Get a bid by ID
         """
         return await self.__session.get(Bid, bid_id)
-
-    # async def get_bids(self, skip: int = 0, limit: int = 100, current_user) -> Sequence[Bid]:
-    #     """
-    #     Get all bids
-    #     """
-    #     if not current_user:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-    #         )
-    #     query = select(Bid).offset(skip).limit(limit)
-    #     result = await self.__session.execute(query)
-    #     return result.scalars().all()
 
     async def get_bids_by_user(self, user_id: int) -> Sequence[Bid]:
         user = await self.__session.get(User, user_id)
@@ -97,7 +100,9 @@ class BidController:
         plate = await self.__session.get(AutoPlate, plate_id)
         return plate.bids
 
-    async def update_bid(self, bid_id: int, data: BidUpdate, current_user) -> Optional[Bid]:
+    async def update_bid(
+            self, bid_id: int, data: BidUpdate, current_user
+    ) -> Optional[Bid]:
         """
         Update a bid
         """
@@ -144,7 +149,6 @@ class BidController:
         await self.__session.delete(bid)
         await self.__session.commit()
         return True
-
 
     async def get_highest_bid_for_plate(self, plate_id: int) -> Optional[Bid]:
         """

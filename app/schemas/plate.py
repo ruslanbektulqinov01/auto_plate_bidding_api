@@ -47,6 +47,7 @@ class Plate(PlateInDBBase):
 
     plate_number: str
 
+
 class PlateInDB(PlateInDBBase):
     """Schema for plate data stored in DB"""
 

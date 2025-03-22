@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-
+from app import websocket
 from app.api import plates, bids, auth
 from app.core.config import settings
+from app.core.celery_app import celery_app
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -25,6 +25,7 @@ app.add_middleware(
 app.include_router(auth.auth_router, prefix=settings.API_PREFIX)
 app.include_router(plates.router, prefix=settings.API_PREFIX)
 app.include_router(bids.router, prefix=settings.API_PREFIX)
+app.include_router(websocket.router)
 
 
 @app.get("/")
@@ -45,6 +46,7 @@ async def health_check():
     Health check endpoint to verify the API is running.
     """
     return {"status": "healthy"}
+
 
 if __name__ == "__main__":
     import uvicorn

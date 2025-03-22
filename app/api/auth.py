@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.controllers.user_controller import UserController
 from app.database import get_session
 from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse, UserLogin
 from app.core.security import (
     authenticate_user,
     create_access_token,
@@ -20,10 +20,10 @@ from app.schemas.token import Token
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Create router instance
-auth_router = APIRouter(tags=["Authentication"])
+auth_router = APIRouter(tags=["Authentication"], prefix="/auth")
 
 
-@auth_router.post("/token", response_model=Token)
+@auth_router.post("/login", response_model=Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session),
@@ -31,6 +31,7 @@ async def login_for_access_token(
     """
     Authenticate user and generate JWT token
     """
+    print(form_data)
     user = await authenticate_user(form_data.username, form_data.password, session)
     if not user:
         raise HTTPException(

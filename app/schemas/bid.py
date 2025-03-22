@@ -13,9 +13,12 @@ class BidBase(BaseModel):
 class BidCreate(BidBase):
     plate_id: int
 
+
 class BidUpdate(BaseModel):
     """Schema for updating bid information"""
+
     amount: Optional[float] = Field(None, description="Amount of the bid", gt=0)
+
 
 class BidInDBBase(BidBase):
     """Base schema for bids stored in DB"""
@@ -42,5 +45,6 @@ class BidInDB(BidInDBBase):
 
 class BidWithDetails(Bid):
     """Schema for bid data with plate and user information"""
+
     plate: Any
     user: Any

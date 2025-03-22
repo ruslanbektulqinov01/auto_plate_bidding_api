@@ -49,3 +49,9 @@ class UserResponse(UserBase):
     """Schema for user response data"""
 
     id: int
+
+
+# user login wiht username and password
+class UserLogin(BaseModel):
+    username: str
+    password: str

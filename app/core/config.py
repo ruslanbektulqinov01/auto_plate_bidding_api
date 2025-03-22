@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     PORT: int = 8000
 
+    # Redis/Celery settings
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL", REDIS_URL)
+    CELERY_RESULT_BACKEND: str = os.getenv("CELERY_RESULT_BACKEND", REDIS_URL)
+
+
     # JWT Authentication settings
     SECRET_KEY: str = os.getenv("SECRET_KEY", "supersecretkey123")
     ALGORITHM: str = "HS256"
@@ -36,7 +42,7 @@ class Settings(BaseSettings):
         return v
 
     # CORS settings
-    CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:8000"]
+    CORS_ORIGINS: [str] = ["*"]
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: list = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     CORS_ALLOW_HEADERS: list = ["*"]

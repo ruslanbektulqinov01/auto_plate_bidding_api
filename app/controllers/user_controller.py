@@ -8,7 +8,7 @@ from datetime import datetime
 from app.core.security import get_password_hash
 from app.database import get_session
 from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate, UserSchema
+from app.schemas.user import UserCreate, UserUpdate
 
 
 class UserController:
@@ -28,8 +28,8 @@ class UserController:
                 # Check if email exists
             if await self.get_user_by_email(data.email):
                 raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Email already exists"
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already exists",
                 )
 
             # Create user object without password field
@@ -48,7 +48,7 @@ class UserController:
                 raise
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error creating user: {str(e)}"
+                detail=f"Error creating user: {str(e)}",
             )
 
     async def get_user(self, user_id: int) -> Optional[User]:
